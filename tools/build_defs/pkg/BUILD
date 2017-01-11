@@ -51,7 +51,7 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":archive",
-        "@bazel_tools//third_party/py/gflags",
+        "//third_party/py/gflags",
     ],
 )
 
@@ -62,7 +62,8 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":archive",
-        "@bazel_tools//third_party/py/gflags",
+        "//third_party/py/gflags",
+        "//third_party/py/six",
     ],
 )
 

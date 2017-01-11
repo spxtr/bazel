@@ -14,7 +14,7 @@
 """Archive manipulation library for the Docker rules."""
 
 import os
-from StringIO import StringIO
+from io import BytesIO
 import subprocess
 import tarfile
 
@@ -196,8 +196,8 @@ class TarFileWriter(object):
       self.tar.addfile(info, fileobj)
       self.members.add(info.name)
     elif info.type != tarfile.DIRTYPE:
-      print('Duplicate file in archive: %s, '
-            'picking first occurrence' % info.name)
+      print(('Duplicate file in archive: %s, '
+            'picking first occurrence' % info.name))
 
   def add_file(self,
                name,
@@ -264,7 +264,7 @@ class TarFileWriter(object):
       tarinfo.linkname = link
     if content:
       tarinfo.size = len(content)
-      self._addfile(tarinfo, StringIO(content))
+      self._addfile(tarinfo, BytesIO(content))
     elif file_content:
       with open(file_content, 'rb') as f:
         tarinfo.size = os.fstat(f.fileno()).st_size
@@ -318,13 +318,13 @@ class TarFileWriter(object):
       # large files.
       # TODO(dmarting): once our py3 support gets better, compile this tools
       # with py3 for proper lzma support.
-      if subprocess.call('which xzcat', shell=True, stdout=subprocess.PIPE):
+      if subprocess.call('PATH=$PATH which xzcat', shell=True, stdout=subprocess.PIPE):
         raise self.Error('Cannot handle .xz and .lzma compression: '
                          'xzcat not found.')
       p = subprocess.Popen('cat %s | xzcat' % tar,
                            shell=True,
                            stdout=subprocess.PIPE)
-      f = StringIO(p.stdout.read())
+      f = BytesIO(p.stdout.read())
       p.wait()
       intar = tarfile.open(fileobj=f, mode='r:')
     else:
@@ -381,7 +381,7 @@ class TarFileWriter(object):
     self.tar.close()
     if self.xz:
       # Support xz compression through xz... until we can use Py3
-      if subprocess.call('which xz', shell=True, stdout=subprocess.PIPE):
+      if subprocess.call('PATH=$PATH which xz', shell=True, stdout=subprocess.PIPE):
         raise self.Error('Cannot handle .xz and .lzma compression: '
                          'xz not found.')
       subprocess.call(
